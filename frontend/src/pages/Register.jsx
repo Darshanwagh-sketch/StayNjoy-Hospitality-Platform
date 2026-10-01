@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus, Hotel } from 'lucide-react';
 
 const Register = () => {
-  const { register } = useAuth();
+  const { user, register } = useAuth();
   const navigate = useNavigate();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('CUSTOMER');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // If user is already logged in, redirect to their dashboard
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'SUPER_ADMIN') navigate('/dashboard/admin');
+      else if (user.role === 'HOTEL_ADMIN') navigate('/dashboard/hotel-admin');
+      else navigate('/dashboard/customer');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,12 +29,12 @@ const Register = () => {
     setError('');
 
     try {
-      const user = await register({ fullName, email, phone, password, role });
-      if (user.role === 'SUPER_ADMIN') navigate('/dashboard/admin');
-      else if (user.role === 'HOTEL_ADMIN') navigate('/dashboard/hotel-admin');
+      const registeredUser = await register({ fullName, email, phone, password, role: 'CUSTOMER' });
+      if (registeredUser.role === 'SUPER_ADMIN') navigate('/dashboard/admin');
+      else if (registeredUser.role === 'HOTEL_ADMIN') navigate('/dashboard/hotel-admin');
       else navigate('/dashboard/customer');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Email may already exist.');
+      setError(err.response?.data?.message || 'Registration failed. Email address may already be registered.');
     } finally {
       setLoading(false);
     }
@@ -40,7 +48,7 @@ const Register = () => {
             <Hotel className="w-7 h-7" style={{ color: 'var(--cyan-accent)' }} />
           </div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--navy-primary)', marginBottom: '6px' }}>Create Account</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Join StaynJoy luxury booking ecosystem</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Join the StayNjoy luxury resort booking platform</p>
         </div>
 
         {error && (
@@ -49,15 +57,16 @@ const Register = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
           <div className="form-group">
             <label className="form-label">Full Name</label>
             <input 
               type="text" 
               className="form-control" 
-              placeholder="Aarav Sharma" 
+              placeholder="e.g. Aarav Sharma" 
               value={fullName} 
               onChange={(e) => setFullName(e.target.value)} 
+              autoComplete="off"
               required 
             />
           </div>
@@ -67,9 +76,10 @@ const Register = () => {
             <input 
               type="email" 
               className="form-control" 
-              placeholder="aarav@example.com" 
+              placeholder="e.g. aarav@example.com" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
+              autoComplete="off"
               required 
             />
           </div>
@@ -82,6 +92,7 @@ const Register = () => {
               placeholder="+91-9876543210" 
               value={phone} 
               onChange={(e) => setPhone(e.target.value)} 
+              autoComplete="off"
             />
           </div>
 
@@ -93,17 +104,10 @@ const Register = () => {
               placeholder="At least 6 characters" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
+              autoComplete="new-password"
               required 
               minLength="6"
             />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Account Role</label>
-            <select className="form-control" value={role} onChange={(e) => setRole(e.target.value)}>
-              <option value="CUSTOMER">Guest / Customer (Book Rooms)</option>
-              <option value="HOTEL_ADMIN">Hotel Manager / Property Owner</option>
-            </select>
           </div>
 
           <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '8px' }} disabled={loading}>
