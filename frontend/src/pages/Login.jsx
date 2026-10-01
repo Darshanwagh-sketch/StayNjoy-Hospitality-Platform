@@ -29,11 +29,6 @@ const Login = () => {
     }
   };
 
-  const handleQuickLogin = (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-  };
-
   return (
     <div className="container" style={{ minHeight: 'calc(100vh - 160px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 0' }}>
       <div className="saas-card" style={{ width: '100%', maxWidth: '460px', padding: '40px' }}>
@@ -42,7 +37,7 @@ const Login = () => {
             <Hotel className="w-7 h-7" style={{ color: 'var(--cyan-accent)' }} />
           </div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--navy-primary)', marginBottom: '6px' }}>Welcome Back</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sign in to manage your luxury stay & reservations</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sign in to access your StayNjoy account & reservations</p>
         </div>
 
         {error && (
@@ -57,7 +52,7 @@ const Login = () => {
             <input 
               type="email" 
               className="form-control" 
-              placeholder="john@example.com" 
+              placeholder="Enter your email" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               required 
@@ -81,23 +76,6 @@ const Login = () => {
             {loading ? 'Authenticating...' : 'Sign In'}
           </button>
         </form>
-
-        <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
-          <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px', textAlign: 'center' }}>
-            Quick Demo Auto-Fill:
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            <button type="button" onClick={() => handleQuickLogin('john@example.com', 'user123')} className="btn btn-secondary btn-sm" style={{ fontSize: '0.75rem' }}>
-              Customer
-            </button>
-            <button type="button" onClick={() => handleQuickLogin('hoteladmin@tajlake.com', 'admin123')} className="btn btn-secondary btn-sm" style={{ fontSize: '0.75rem' }}>
-              Hotel Admin
-            </button>
-            <button type="button" onClick={() => handleQuickLogin('admin@hospitality.com', 'admin123')} className="btn btn-secondary btn-sm" style={{ fontSize: '0.75rem' }}>
-              Super Admin
-            </button>
-          </div>
-        </div>
 
         <p style={{ marginTop: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
           Don't have an account? <Link to="/register" style={{ color: 'var(--electric-blue)', fontWeight: 600 }}>Create One</Link>
