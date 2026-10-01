@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { LogIn, Hotel } from 'lucide-react';
+import { LogIn, Hotel, LogOut } from 'lucide-react';
 
 const Login = () => {
-  const { login } = useAuth();
+  const { user, login, logout } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -12,15 +12,24 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // If user is already logged in, redirect to their dashboard
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'SUPER_ADMIN') navigate('/dashboard/admin');
+      else if (user.role === 'HOTEL_ADMIN') navigate('/dashboard/hotel-admin');
+      else navigate('/dashboard/customer');
+    }
+  }, [user, navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const user = await login({ email, password });
-      if (user.role === 'SUPER_ADMIN') navigate('/dashboard/admin');
-      else if (user.role === 'HOTEL_ADMIN') navigate('/dashboard/hotel-admin');
+      const loggedUser = await login({ email, password });
+      if (loggedUser.role === 'SUPER_ADMIN') navigate('/dashboard/admin');
+      else if (loggedUser.role === 'HOTEL_ADMIN') navigate('/dashboard/hotel-admin');
       else navigate('/dashboard/customer');
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password');
@@ -46,7 +55,7 @@ const Login = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
           <div className="form-group">
             <label className="form-label">Email Address</label>
             <input 
@@ -55,6 +64,7 @@ const Login = () => {
               placeholder="Enter your email" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
+              autoComplete="off"
               required 
             />
           </div>
@@ -67,6 +77,7 @@ const Login = () => {
               placeholder="••••••••" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
+              autoComplete="new-password"
               required 
             />
           </div>
